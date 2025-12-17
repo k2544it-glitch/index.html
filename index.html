@@ -1,0 +1,48 @@
+<script>
+let isBuffalo = false;
+let cameraReady = false;
+
+const video = document.getElementById('video');
+
+navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } })
+.then(stream => {
+  video.srcObject = stream;
+  video.onloadedmetadata = () => {
+    cameraReady = true;
+  };
+})
+.catch(() => alert('ไม่สามารถเปิดกล้องได้'));
+
+function setAnimal(b){ isBuffalo = b; }
+
+function calculate(){
+  if(!cameraReady || video.videoWidth < 200){
+    alert('กล้องยังไม่พร้อม กรุณารอสักครู่');
+    return;
+  }
+
+  const price = parseFloat(document.getElementById('price').value || 0);
+
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+
+  // ค่าจูนสำหรับมือถือ (กันหลุด)
+  let heartGirthIn = (w * 0.9) / 25;
+  let lengthIn     = (h * 0.7) / 25;
+
+  let weight = (heartGirthIn ** 2 * lengthIn) / 10838;
+
+  if(isBuffalo) weight *= 1.10;
+
+  // กันค่าพัง
+  if(weight < 50) weight *= 6;
+  if(weight < 100) weight += 150;
+
+  const total = weight * price;
+
+  document.getElementById('weight').innerText =
+    `น้ำหนัก: ${weight.toFixed(0)} กก.`;
+  document.getElementById('total').innerText =
+    `ราคา: ${total.toLocaleString()} บาท`;
+}
+</script>
